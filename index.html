@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <h2>JavaScript Math.random()</h2>
+
+    <p>Every time you click the button, getRndInteger(min, max) returns a random number between 1 and 10 (both
+        included):</p>
+
+    <button onclick="document.getElementById('demo').innerHTML = getRndInteger(0,600)">Click Me</button>
+
+    <p id="demo"></p>
+
+    <script>
+        const array = Array.apply(null, { length: 10 }).map(Function.call, Math.random);//Array.from(Array(100).keys());
+
+        const index = getRndInteger(0, array.length - 1);
+
+        console.log(array[index]);
+
+        document.getElementById('demo').innerHTML = `${JSON.stringify(array)}\n${index} - ${array[index]}`;
+
+        function getRndInteger(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+    </script>
+
+</body>
+
+</html>
