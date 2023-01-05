@@ -8,18 +8,44 @@
     <p>Every time you click the button, getRndInteger(min, max) returns a random number between 1 and 10 (both
         included):</p>
 
-    <button onclick="document.getElementById('demo').innerHTML = getRndInteger(0,600)">Click Me</button>
+    <button onclick="randomPrize()">Click Me</button>
 
     <p id="demo"></p>
 
     <script>
-        const array = Array.apply(null, { length: 10 }).map(Function.call, Math.random);//Array.from(Array(100).keys());
+        const array = Array.apply(null, { length: 300 }).map(Function.call, Math.random);
+        let prizeArray;
 
-        const index = getRndInteger(0, array.length - 1);
+        function showResultFromIndex(index) {
+            document.getElementById('demo').innerHTML = `${array.length} - ${JSON.stringify(prizeArray)}\n${index} - ${array[index]}`;
+            console.log(index);
+        }
 
-        console.log(array[index]);
+        function randomPrize() {
+            prizeArray = Array.apply(null, { length: 3 }).map(() => getRndInteger(0, array.length - 1));
 
-        document.getElementById('demo').innerHTML = `${JSON.stringify(array)}\n${index} - ${array[index]}`;
+            document.getElementById('demo').innerHTML = `${array.length} - ${JSON.stringify(prizeArray)}\n`;
+
+            let count = 1;
+            let index;
+            const randomInterval = setInterval(() => {
+                index = getRndInteger(0, array.length - 1);
+                showResultFromIndex(index);
+
+                count++;
+            }, 100);
+
+            setTimeout(() => {
+                console.log({ count })
+                if (!prizeArray.includes(index)) {
+                    const randomPrizeIndex = getRndInteger(0, prizeArray.length - 1);
+                    index = prizeArray[randomPrizeIndex];
+                    showResultFromIndex(index);
+                    array.splice(index, 1);
+                }
+                clearInterval(randomInterval);
+            }, 3000);
+        }
 
         function getRndInteger(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
