@@ -1,54 +1,117 @@
 <!DOCTYPE html>
 <html>
 
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Prize</title>
+    <script src="https://cdn.rawgit.com/Keyang/node-csvtojson/d41f44aa/browser/csvtojson.min.js"></script>
+</head>
+
 <body>
 
-    <h2>JavaScript Math.random()</h2>
+    <h2>Random Prize</h2>
 
-    <p>Every time you click the button, getRndInteger(min, max) returns a random number between 1 and 10 (both
-        included):</p>
+    <button onclick="displayEmployees()">Load Data</button>
 
-    <button onclick="randomPrize()">Click Me</button>
+    <button onclick="randomPrize(1)">Win Prize 1</button>
+
+    <button onclick="randomPrize(2)">Win Prize 2</button>
+
+    <button onclick="randomPrize(3)">Win Prize 3</button>
+
+    <button onclick="randomPrize(4)">Win Prize 4</button>
 
     <p id="demo"></p>
 
+    <p id="prize"></p>
+
+    <main></main>
+
     <script>
-        const array = Array.apply(null, { length: 300 }).map(Function.call, Math.random);
-        let prizeArray;
+        let array = Array.apply(null, { length: 300 }).map(Function.call, Math.random);
+        let winners = [];
 
-        function showResultFromIndex(index) {
-            document.getElementById('demo').innerHTML = `${array.length} - ${JSON.stringify(prizeArray)}\n${index} - ${array[index]}`;
-            console.log(index);
-        }
+        function randomPrize(prizeNumber) {
+            let prizeArray = [];
 
-        function randomPrize() {
-            prizeArray = Array.apply(null, { length: 3 }).map(() => getRndInteger(0, array.length - 1));
+            function showResultFromIndex(index) {
+                document.getElementById('demo').innerHTML = `Total: ${array.length}<br/>Priority: ${JSON.stringify(prizeArray)}<br/>Winner: ${index} - ${array[index].ID}`;
+            }
 
-            document.getElementById('demo').innerHTML = `${array.length} - ${JSON.stringify(prizeArray)}\n`;
+            // prizeArray = Array.apply(null, { length: 3 }).map(() => getRndInteger(0, array.length - 1));
+            array.forEach((emp, index) => {
+                const prizeStr = emp['Prize (1, 2, 3)']
+                const prize = prizeStr === "" ? 4 : parseInt(prizeStr);
 
-            let count = 1;
+                if (prize <= prizeNumber) {
+                    prizeArray.push(index);
+                }
+            });
+
+            if (prizeArray.length === 0) {
+                return;
+            }
+
+            showResultFromIndex(0);
+
             let index;
             const randomInterval = setInterval(() => {
                 index = getRndInteger(0, array.length - 1);
                 showResultFromIndex(index);
-
-                count++;
             }, 100);
 
             setTimeout(() => {
-                console.log({ count })
+                clearInterval(randomInterval);
+                let winner;
                 if (!prizeArray.includes(index)) {
                     const randomPrizeIndex = getRndInteger(0, prizeArray.length - 1);
                     index = prizeArray[randomPrizeIndex];
+                    winner = array[index];
                     showResultFromIndex(index);
                     array.splice(index, 1);
+                } else {
+                    winner = array[index];
                 }
-                clearInterval(randomInterval);
+                winners.push({ type: prizeNumber, winner });
+
+                let winStr = '';
+                winners.forEach(win => {
+                    winStr += `<br/>Prize: ${win.type} - ${JSON.stringify(win.winner)}<br/>`
+                });
+                document.getElementById('prize').innerHTML = winStr;
             }, 3000);
         }
 
         function getRndInteger(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        async function displayEmployees() {
+            const main = document.querySelector('main');
+            main.innerHTML = 'Loading...';
+            const employees = await fetchEmployees();
+            main.innerHTML = '<hr/>';
+            employees.forEach(element => {
+                const colz = Object.keys(element);
+
+                colz.forEach(c => {
+                    main.innerHTML += '<p>' + element[c] + '</p>';
+                })
+                main.innerHTML += '<hr/>'
+            });
+
+            array = employees;
+        }
+
+        async function fetchEmployees() {
+            const url = 'https://docs.google.com/spreadsheets/d/16ZBI5d7z4XDpIHwbvvlpW32q_E8dPKJ3NgHLiG0GHh4/export?format=csv'
+
+            const result = await fetch(url);
+            const csvString = await result.text();
+            const objs = await csv().fromString(csvString);
+            return objs;
         }
     </script>
 
