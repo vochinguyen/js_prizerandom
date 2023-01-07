@@ -59,7 +59,7 @@
                 const prizeStr = emp.Prize;
                 const prize = prizeStr === "" ? lastPrize : parseInt(prizeStr);
 
-                if (prize <= prizeNumber) {
+                if (prize === prizeNumber) {
                     prizeArray.push(emp);
                 }
             });
