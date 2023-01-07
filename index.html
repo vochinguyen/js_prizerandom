@@ -13,7 +13,7 @@
 
     <h2>Random Prize</h2>
 
-    <button onclick="displayEmployees()">Load Data</button>
+    <!-- <button onclick="displayEmployees()">Load Data</button> -->
 
     <button onclick="randomPrize(1)">Win Prize 1</button>
 
@@ -23,6 +23,12 @@
 
     <button onclick="randomPrize(4)">Win Prize 4</button>
 
+    <button onclick="randomPrize(5)">Win Prize 5</button>
+
+    <button onclick="randomPrize(6)">Win Prize 6</button>
+
+    <button onclick="randomPrize(7)">Win Prize 7</button>
+
     <p id="demo"></p>
 
     <p id="prize"></p>
@@ -30,23 +36,31 @@
     <main></main>
 
     <script>
-        let array = Array.apply(null, { length: 300 }).map(Function.call, Math.random);
+        let array = [];//Array.apply(null, { length: 300 }).map(Function.call, Math.random);
         let winners = [];
+        let mapID = new Map();
+        const lastPrize = 7;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await displayEmployees();
+        });
 
         function randomPrize(prizeNumber) {
+            const numOfLoop = prizeNumber === lastPrize ? 10 : 1;
+            const interval = prizeNumber === lastPrize ? 50 : 100;
             let prizeArray = [];
 
-            function showResultFromIndex(index) {
-                document.getElementById('demo').innerHTML = `Total: ${array.length}<br/>Priority: ${JSON.stringify(prizeArray)}<br/>Winner: ${index} - ${array[index].ID}`;
+            function showResultFromIndex(winner) {
+                document.getElementById('demo').innerHTML = `<br/>Random Prize ${prizeNumber}...<br/>Winner: ${winner.ID}`;
             }
 
             // prizeArray = Array.apply(null, { length: 3 }).map(() => getRndInteger(0, array.length - 1));
             array.forEach((emp, index) => {
-                const prizeStr = emp['Prize (1, 2, 3)']
-                const prize = prizeStr === "" ? 4 : parseInt(prizeStr);
+                const prizeStr = emp.Prize;
+                const prize = prizeStr === "" ? lastPrize : parseInt(prizeStr);
 
                 if (prize <= prizeNumber) {
-                    prizeArray.push(index);
+                    prizeArray.push(emp);
                 }
             });
 
@@ -54,31 +68,49 @@
                 return;
             }
 
-            showResultFromIndex(0);
+            showResultFromIndex(array[0]);
 
             let index;
             const randomInterval = setInterval(() => {
                 index = getRndInteger(0, array.length - 1);
-                showResultFromIndex(index);
-            }, 100);
+                let winner = array[index];
+                showResultFromIndex(winner);
+            }, interval);
 
             setTimeout(() => {
                 clearInterval(randomInterval);
-                let winner;
-                if (!prizeArray.includes(index)) {
-                    const randomPrizeIndex = getRndInteger(0, prizeArray.length - 1);
-                    index = prizeArray[randomPrizeIndex];
-                    winner = array[index];
-                    showResultFromIndex(index);
-                    array.splice(index, 1);
+
+                if (prizeNumber === lastPrize) {
+                    for (let i = 0; i < numOfLoop; i++) {
+                        const randomPrizeIndex = getRndInteger(0, prizeArray.length - 1);
+                        let winner = prizeArray[randomPrizeIndex];
+                        showResultFromIndex(winner);
+                        prizeArray.splice(randomPrizeIndex, 1);
+
+                        winners.push({ type: prizeNumber, winner, time: Date.now() });
+                        mapID.set(winner.ID, 1);
+                    }
                 } else {
-                    winner = array[index];
+                    let winner = array[index];
+                    if (!prizeArray.find(x => x.ID === winner.ID)) {
+                        const randomPrizeIndex = getRndInteger(0, prizeArray.length - 1);
+                        winner = prizeArray[randomPrizeIndex];
+                        showResultFromIndex(winner);
+                        prizeArray.splice(randomPrizeIndex, 1);
+                    }
+
+                    winners.push({ type: prizeNumber, winner, time: Date.now() });
+                    mapID.set(winner.ID, 1);
                 }
-                winners.push({ type: prizeNumber, winner });
+
+                array = array.filter((item) => mapID.get(item.ID) === undefined)
+                // console.log(array);
+                // console.log(mapID)
 
                 let winStr = '';
+                winners = winners.sort((a, b) => a.time < b.time);
                 winners.forEach(win => {
-                    winStr += `<br/>Prize: ${win.type} - ${JSON.stringify(win.winner)}<br/>`
+                    winStr += `<br/>Winner Prize ${win.type}: ${win.winner.ID}<br/>`
                 });
                 document.getElementById('prize').innerHTML = winStr;
             }, 3000);
@@ -92,15 +124,16 @@
             const main = document.querySelector('main');
             main.innerHTML = 'Loading...';
             const employees = await fetchEmployees();
-            main.innerHTML = '<hr/>';
-            employees.forEach(element => {
-                const colz = Object.keys(element);
+            main.innerHTML = '';
+            // main.innerHTML = '<hr/>';
+            // employees.forEach(element => {
+            //     const colz = Object.keys(element);
 
-                colz.forEach(c => {
-                    main.innerHTML += '<p>' + element[c] + '</p>';
-                })
-                main.innerHTML += '<hr/>'
-            });
+            //     colz.forEach(c => {
+            //         main.innerHTML += '<p>' + element[c] + '</p>';
+            //     })
+            //     main.innerHTML += '<hr/>'
+            // });
 
             array = employees;
         }
