@@ -49,9 +49,11 @@
             const interval = prizeNumber === lastPrize ? 50 : 100;
             let prizeArray = [];
             let winners = [];
+            
+            document.getElementById('demo').innerHTML = "";
 
             function showResultFromIndex(winner) {
-                document.getElementById('demo').innerHTML = `<br/>Random Prize ${prizeNumber}...<br/>Winner: ${winner.ID}`;
+                document.getElementById('demo').innerHTML = `<br/>Random Prize ${prizeNumber}: ${winner.ID}`;
             }
 
             // prizeArray = Array.apply(null, { length: 3 }).map(() => getRndInteger(0, array.length - 1));
@@ -106,6 +108,8 @@
                 array = array.filter((item) => mapID.get(item.ID) === undefined)
                 // console.log(array);
                 // console.log(mapID)
+
+                document.getElementById('demo').innerHTML = "";
 
                 let winStr = '';
                 winners = winners.sort((a, b) => a.time < b.time);
