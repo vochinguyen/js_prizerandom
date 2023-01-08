@@ -51,6 +51,7 @@
             let winners = [];
             
             document.getElementById('demo').innerHTML = "";
+            document.getElementById('prize').innerHTML = "";
 
             function showResultFromIndex(winner) {
                 document.getElementById('demo').innerHTML = `<br/>Random Prize ${prizeNumber}: ${winner.ID}`;
@@ -90,7 +91,7 @@
                         prizeArray.splice(randomPrizeIndex, 1);
 
                         winners.push({ type: prizeNumber, winner, time: Date.now() });
-                        mapID.set(winner.ID, 1);
+                        mapID.set(winner.ID, prizeNumber);
                     }
                 } else {
                     let winner = array[index];
@@ -102,7 +103,7 @@
                     }
 
                     winners.push({ type: prizeNumber, winner, time: Date.now() });
-                    mapID.set(winner.ID, 1);
+                    mapID.set(winner.ID, prizeNumber);
                 }
 
                 array = array.filter((item) => mapID.get(item.ID) === undefined)
