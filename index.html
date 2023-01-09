@@ -7,6 +7,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Random Prize</title>
     <script src="https://cdn.rawgit.com/Keyang/node-csvtojson/d41f44aa/browser/csvtojson.min.js"></script>
+    <style>
+        button {
+            background-color: yellow;
+            color: red;
+            font-size: large;
+            width: 140px;
+            height: 40px;
+        }
+
+        #prize {
+            color: red;
+            font-size: x-large;
+        }
+
+        #demo {
+            font-size: large;
+            color: green;
+        }
+
+        #showAllButton {
+            color: gray;
+            background-color: rgb(5, 247, 126);
+        }
+    </style>
 </head>
 
 <body>
@@ -29,6 +53,8 @@
 
     <button onclick="randomPrize(7)">Win Prize 7</button>
 
+    <button id="showAllButton" onclick="showAllWinners()">All Winners</button>
+
     <p id="demo"></p>
 
     <p id="prize"></p>
@@ -42,6 +68,7 @@
 
         let array = [];//Array.apply(null, { length: 300 }).map(Function.call, Math.random);
         let mapID = new Map();
+        let allWinners = [];
         const lastPrize = 7;
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -63,7 +90,7 @@
 
             // prizeArray = Array.apply(null, { length: 3 }).map(() => getRndInteger(0, array.length - 1));
             if (isDemo) {
-                prizeArray = array;
+                prizeArray = [].concat(array);
             } else {
                 array.forEach((emp, index) => {
                     const prizeStr = emp.Prize;
@@ -98,7 +125,7 @@
                         showResultFromIndex(winner);
                         prizeArray.splice(randomPrizeIndex, 1);
 
-                        winners.push({ type: prizeNumber, winner, time: Date.now() });
+                        winners.push({ type: prizeNumber, winner, time: Date.now() + i });
                         mapID.set(winner.ID, prizeNumber);
                     }
                 } else {
@@ -114,6 +141,7 @@
                     mapID.set(winner.ID, prizeNumber);
                 }
 
+                allWinners = allWinners.concat(winners);
                 array = array.filter((item) => mapID.get(item.ID) === undefined)
                 // console.log(array);
                 // console.log(mapID)
@@ -123,10 +151,19 @@
                 let winStr = '';
                 winners = winners.sort((a, b) => a.time < b.time);
                 winners.forEach(win => {
-                    winStr += `<br/>Winner Prize ${win.type}: ${win.winner.ID}<br/>`
+                    winStr += `<br/>Winner Prize ${win.type}: <b>${win.winner.ID}</b><br/>`
                 });
                 document.getElementById('prize').innerHTML = winStr;
             }, 3000);
+        }
+
+        function showAllWinners() {
+            let winStr = '';
+            allWinners = allWinners.sort((a, b) => a.time < b.time);
+            allWinners.forEach(win => {
+                winStr += `<br/>Winner Prize ${win.type}: <b>${win.winner.ID}</b><br/>`
+            });
+            document.getElementById('prize').innerHTML = winStr;
         }
 
         function getRndInteger(min, max) {
