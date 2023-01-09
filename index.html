@@ -36,6 +36,10 @@
     <main></main>
 
     <script>
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        const isDemo = params['demo'] === undefined ? false : params['demo'];
+
         let array = [];//Array.apply(null, { length: 300 }).map(Function.call, Math.random);
         let mapID = new Map();
         const lastPrize = 7;
@@ -49,7 +53,7 @@
             const interval = prizeNumber === lastPrize ? 50 : 100;
             let prizeArray = [];
             let winners = [];
-            
+
             document.getElementById('demo').innerHTML = "";
             document.getElementById('prize').innerHTML = "";
 
@@ -58,14 +62,18 @@
             }
 
             // prizeArray = Array.apply(null, { length: 3 }).map(() => getRndInteger(0, array.length - 1));
-            array.forEach((emp, index) => {
-                const prizeStr = emp.Prize;
-                const prize = prizeStr === "" ? lastPrize : parseInt(prizeStr);
+            if (isDemo) {
+                prizeArray = array;
+            } else {
+                array.forEach((emp, index) => {
+                    const prizeStr = emp.Prize;
+                    const prize = prizeStr === "" ? lastPrize : parseInt(prizeStr);
 
-                if (prize === prizeNumber) {
-                    prizeArray.push(emp);
-                }
-            });
+                    if (prize === prizeNumber) {
+                        prizeArray.push(emp);
+                    }
+                });
+            }
 
             if (prizeArray.length === 0) {
                 return;
