@@ -91,7 +91,7 @@
             document.getElementById('prize').innerHTML = "";
 
             function showResultFromIndex(winner) {
-                document.getElementById('demo').innerHTML = `<br/>Random Prize ${prizeNumber}: ${zeroPad(winner.ID, 5)}`;
+                document.getElementById('demo').innerHTML = `<br/>${zeroPad(winner.ID, 5)}`;
             }
 
             // prizeArray = Array.apply(null, { length: 3 }).map(() => getRndInteger(0, array.length - 1));
@@ -158,7 +158,7 @@
                 winners = winners.sort((a, b) => a.time < b.time);
 
                 winners.forEach(win => {
-                    winStr += `<br/>Winner Prize ${win.type}: <b>${zeroPad(win.winner.ID, 5)}</b><br/>`
+                    winStr += `<br/><b>${zeroPad(win.winner.ID, 5)}</b><br/>`
                 });
                 document.getElementById('prize').innerHTML = winStr;
             }, 3000);
