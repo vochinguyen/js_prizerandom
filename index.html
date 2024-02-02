@@ -18,11 +18,11 @@
 
         #prize {
             color: red;
-            font-size: x-large;
+            font-size: 85px;
         }
 
         #demo {
-            font-size: large;
+            font-size: 80px;
             color: green;
         }
 
@@ -51,7 +51,7 @@
 
     <button onclick="randomPrize(6)">Win Prize 6</button>
 
-    <button onclick="randomPrize(7)">Win Prize 7</button>
+    <!-- <button onclick="randomPrize(7)">Win Prize 7</button> -->
 
     <button id="showAllButton" onclick="showAllWinners()">All Winners</button>
 
@@ -62,14 +62,20 @@
     <main></main>
 
     <script>
+        const zeroPad = (num, places) => String(num).padStart(places, '0');
+
         const urlSearchParams = new URLSearchParams(window.location.search);
         const params = Object.fromEntries(urlSearchParams.entries());
         const isDemo = params['demo'] === undefined ? false : params['demo'];
+        const isServer = params['server'] === undefined ? false : params['server'];
 
-        let array = [];//Array.apply(null, { length: 300 }).map(Function.call, Math.random);
+        console.log(params)
+
+        // let array = Array.apply(null, ).map(Function.call, Math.random);
+        array = Array.apply(null, { length: 10000 }).map((x, index) => ({ ID: index + 1, Prize: 0 }))
         let mapID = new Map();
         let allWinners = [];
-        const lastPrize = 7;
+        const lastPrize = 6;
 
         document.addEventListener('DOMContentLoaded', async () => {
             await displayEmployees();
@@ -85,7 +91,7 @@
             document.getElementById('prize').innerHTML = "";
 
             function showResultFromIndex(winner) {
-                document.getElementById('demo').innerHTML = `<br/>Random Prize ${prizeNumber}: ${winner.ID}`;
+                document.getElementById('demo').innerHTML = `<br/>Random Prize ${prizeNumber}: ${zeroPad(winner.ID, 5)}`;
             }
 
             // prizeArray = Array.apply(null, { length: 3 }).map(() => getRndInteger(0, array.length - 1));
@@ -150,8 +156,9 @@
 
                 let winStr = '';
                 winners = winners.sort((a, b) => a.time < b.time);
+
                 winners.forEach(win => {
-                    winStr += `<br/>Winner Prize ${win.type}: <b>${win.winner.ID}</b><br/>`
+                    winStr += `<br/>Winner Prize ${win.type}: <b>${zeroPad(win.winner.ID, 5)}</b><br/>`
                 });
                 document.getElementById('prize').innerHTML = winStr;
             }, 3000);
@@ -172,9 +179,25 @@
 
         async function displayEmployees() {
             const main = document.querySelector('main');
-            main.innerHTML = 'Loading...';
-            const employees = await fetchEmployees();
-            main.innerHTML = '';
+
+            let employees = [];
+
+            if (!isDemo) {
+                main.innerHTML = 'Loading...';
+                employees = !isServer ? [
+                    { ID: 214, Prize: 1 },
+                    { ID: 218, Prize: 2 },
+                    { ID: 1224, Prize: 3 },
+                    { ID: 2468, Prize: 3 },
+                    { ID: 2469, Prize: 4 },
+                    { ID: 808, Prize: 4 },
+                    { ID: 1225, Prize: 4 },
+                    { ID: 6869, Prize: 4 },
+                    { ID: 7879, Prize: 4 },
+                ] : await fetchEmployees();
+                main.innerHTML = '';
+            }
+
             // main.innerHTML = '<hr/>';
             // employees.forEach(element => {
             //     const colz = Object.keys(element);
@@ -185,7 +208,13 @@
             //     main.innerHTML += '<hr/>'
             // });
 
-            array = employees;
+            employees.forEach(y => {
+                const index = array.findIndex(x => x.ID === parseInt(y.ID));
+                if (index !== undefined) {
+                    array[index] = { ID: parseInt(y.ID), Prize: parseInt(y.Prize) };
+                    // console.log(array[index]);
+                }
+            });
         }
 
         async function fetchEmployees() {
