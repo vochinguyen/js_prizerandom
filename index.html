@@ -78,8 +78,6 @@
         const isDemo = params['demo'] === undefined ? false : params['demo'];
         const isServer = params['server'] === undefined ? false : params['server'];
 
-        console.log(params)
-
         // let array = Array.apply(null, ).map(Function.call, Math.random);
         array = Array.apply(null, { length: 10000 }).map((x, index) => ({ ID: index + 1, Prize: 0 }))
         let mapID = new Map();
