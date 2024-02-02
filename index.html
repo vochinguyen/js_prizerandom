@@ -192,15 +192,7 @@
             if (!isDemo) {
                 main.innerHTML = 'Loading...';
                 employees = !isServer ? [
-                    { ID: 214, Prize: 1 },
-                    { ID: 218, Prize: 2 },
-                    { ID: 1224, Prize: 3 },
-                    { ID: 2468, Prize: 3 },
-                    { ID: 2469, Prize: 4 },
-                    { ID: 808, Prize: 4 },
-                    { ID: 1225, Prize: 4 },
-                    { ID: 6869, Prize: 4 },
-                    { ID: 7879, Prize: 4 },
+                    // { ID: 123, Prize: 1 },
                 ] : await fetchEmployees();
                 main.innerHTML = '';
             }
